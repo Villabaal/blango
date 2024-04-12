@@ -71,8 +71,9 @@ class Dev(Configuration):
       'django.contrib.staticfiles',
       'crispy_forms',
       'crispy_bootstrap5',
+      'blango_auth',
       'blog',
-      'debug_toolbar'
+      'debug_toolbar',
   ]
   
   MIDDLEWARE = [
@@ -151,7 +152,7 @@ class Dev(Configuration):
   
   # Default primary key field type
   # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
-  
+  AUTH_USER_MODEL = "blango_auth.User"
   DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
   INTERNAL_IPS = ["192.168.10.226"]
   
