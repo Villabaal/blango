@@ -21,6 +21,11 @@ class Dev(Configuration):
   EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
   ACCOUNT_ACTIVATION_DAYS = 7
   
+  ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+  ACCOUNT_EMAIL_REQUIRED = True
+  ACCOUNT_USERNAME_REQUIRED = False
+  ACCOUNT_AUTHENTICATION_METHOD = "email"
+
   LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -71,11 +76,16 @@ class Dev(Configuration):
       'django.contrib.sessions',
       'django.contrib.messages',
       'django.contrib.staticfiles',
+      'django.contrib.sites',
       'crispy_forms',
       'crispy_bootstrap5',
       'blango_auth',
       'blog',
       'debug_toolbar',
+      'allauth',
+      "allauth.account",
+      "allauth.socialaccount",
+      "allauth.socialaccount.providers.google",
   ]
   
   MIDDLEWARE = [
@@ -157,6 +167,9 @@ class Dev(Configuration):
   AUTH_USER_MODEL = "blango_auth.User"
   DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
   INTERNAL_IPS = ["192.168.10.226"]
+
+  SITE_ID = 1
+
   
 class Prod(Dev):
     DEBUG = False
