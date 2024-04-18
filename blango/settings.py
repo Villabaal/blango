@@ -58,6 +58,13 @@ class Dev(Configuration):
     ],
   }
 
+  SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Token": {"type": "apiKey", "name": "Authorization", "in": "header"},
+        "Basic": {"type": "basic"},
+    }
+  }
+
   # Quick-start development settings - unsuitable for production
   # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
   
@@ -98,6 +105,7 @@ class Dev(Configuration):
       "allauth.socialaccount.providers.google",
       "rest_framework",
       "rest_framework.authtoken",
+      "drf_yasg",
   ]
   
   MIDDLEWARE = [
