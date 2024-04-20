@@ -14,6 +14,7 @@ from blog.api.serializers import PostSerializer, UserSerializer, PostDetailSeria
 from blango_auth.models import User
 from blog.models import Post, Tag
 from blog.api.permissions import AuthorModifyOrReadOnly, IsAdminUserForObject
+from blog.api.filters import PostFilterSet
 
 from datetime import timedelta
 
@@ -21,7 +22,9 @@ from datetime import timedelta
 class PostViewSet(viewsets.ModelViewSet):
     permission_classes = [AuthorModifyOrReadOnly | IsAdminUserForObject]
     queryset = Post.objects.all()
-
+    filterset_class = PostFilterSet
+    ordering_fields = ["published_at", "author", "title", "slug"]
+    
     def get_serializer_class(self):
         if self.action in ("list", "create"):
             return PostSerializer
@@ -77,6 +80,20 @@ class PostViewSet(viewsets.ModelViewSet):
                 f"'new', 'today' or 'week'"
             )
 
+    def mine(self, request):
+        if request.user.is_anonymous:
+            raise PermissionDenied("You must be logged in to see which Posts are yours")
+        posts = self.get_queryset().filter(author=request.user)
+
+        page = self.paginate_queryset(posts)
+
+        if page is not None:
+            serializer = PostSerializer(page, many=True, context={"request": request})
+            return self.get_paginated_response(serializer.data)
+
+        serializer = PostSerializer(posts, many=True, context={"request": request})
+        return Response(serializer.data)            
+
 class UserDetail(generics.RetrieveAPIView):
     lookup_field = "email"
     queryset = User.objects.all()
@@ -105,3 +122,16 @@ class TagViewSet(viewsets.ModelViewSet):
     @method_decorator(cache_page(300))
     def retrieve(self, *args, **kwargs):
         return super(TagViewSet, self).retrieve(*args, **kwargs)
+
+    def posts(self, request, pk=None):
+        tag = self.get_object()
+        page = self.paginate_queryset(tag.posts)
+        if page is not None:
+            post_serializer = PostSerializer(
+                page, many=True, context={"request": request}
+            )
+            return self.get_paginated_response(post_serializer.data)
+        post_serializer = PostSerializer(
+            tag.posts, many=True, context={"request": request}
+        )
+        return Response(post_serializer.data)
